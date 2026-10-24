@@ -7,7 +7,7 @@
     <style>
         body {
             margin: 0;
-            padding: 70px 20px 20px 20px; /* အပေါ်ကို နေရာချန်ထားတယ် */
+            padding: 70px 20px 20px 20px; 
             background: linear-gradient(to bottom, #2b2b52, #6a5acd, #b08d9e); 
             font-family: Arial, sans-serif;
             display: flex;
@@ -108,8 +108,8 @@
             max-width: 350px;
             position: relative;
             margin-top: 15px; 
-            /* အောက်က အိုင်ကွန် ၃ ခုကို နည်းနည်းတင်ဖို့ အောက်ကို margin ချန်ထားတယ် */
-            margin-bottom: 130px; 
+            /* အောက်က နာရီအတွက် နေရာချန်ထားတယ် */
+            margin-bottom: 180px; 
         }
 
         .app-item {
@@ -158,10 +158,10 @@
             z-index: 10;
         }
 
-        /* နာရီ (Clock) ဒီဇိုင်း */
+        /* နာရီ (Clock) ဒီဇိုင်း အသစ် */
         .clock-container {
             position: absolute;
-            bottom: 20px;
+            bottom: 50px; /* အောက်ကနေ နည်းနည်းတင်လိုက်တယ် */
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -171,17 +171,17 @@
         }
 
         .analog-clock {
-            width: 120px;
-            height: 120px;
+            width: 140px;
+            height: 140px;
             border-radius: 50%;
-            border: 4px solid rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.4);
             position: relative;
-            box-shadow: 0 0 15px rgba(0,0,0,0.5);
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.05); /* Glass ပုံစံ */
+            backdrop-filter: blur(10px);
         }
 
-        /* နာရီအမှတ်တံတွေ */
+        /* နာရီအမှတ်တံတွေ (နံပါတ်များ) */
         .clock-numbers {
             position: absolute;
             width: 100%;
@@ -189,11 +189,29 @@
         }
         .number {
             position: absolute;
-            color: white;
-            font-size: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 15px;
             font-weight: bold;
-            top: 5px; left: 50%;
-            transform-origin: 0 55px; /* နာရီဝိုင်းအလယ်ကို ချိန်ညှိရန် */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            top: 10px; left: 50%;
+            transform-origin: 0 60px; /* အလယ်ဗဟိုကို ချိန်ညှိထားတယ် */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* နံပါတ်မပါတဲ့ ပုံစံအတွက် အမှတ်လေးများ */
+        .clock-dots {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+        }
+        .dot {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            top: 10px; left: 50%;
+            transform-origin: 0 60px;
         }
 
         /* အပ်တွေ */
@@ -205,63 +223,48 @@
             background: white;
             border-radius: 4px;
             transform: translateX(-50%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .hour-hand {
-            width: 4px;
-            height: 30px;
+            width: 5px;
+            height: 35px;
             background: #ff4d4d; /* နာရီအပ်နီ */
             z-index: 3;
         }
 
         .minute-hand {
             width: 3px;
-            height: 45px;
+            height: 50px;
             background: white;
             z-index: 4;
         }
 
         .second-hand {
-            width: 1px;
-            height: 50px;
+            width: 2px;
+            height: 60px;
             background: #ffcc00; /* စက္ကန့်အပ်ဝါ */
             z-index: 5;
         }
 
         .center-dot {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             background: #ff4d4d;
+            border: 2px solid white;
             border-radius: 50%;
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             z-index: 6;
-        }
-        
-        /* နံပါတ်မပါတဲ့ ပုံစံအတွက် နာရီအမှတ်လေးတွေ */
-        .clock-dots {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-        }
-        .dot {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: white;
-            border-radius: 50%;
-            top: 5px; left: 50%;
-            transform-origin: 0 55px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
     </style>
 </head>
 <body>
 
-    <!-- Settings ခလုတ် -->
     <button class="settings-btn" onclick="toggleSettings()">⚙️</button>
 
-    <!-- Settings Panel -->
     <div class="settings-panel" id="settingsPanel">
         <h3>ချိန်ညှိမှုများ</h3>
         
@@ -321,7 +324,6 @@
         </a>
     </div>
 
-    <!-- နာရီ -->
     <div class="clock-container">
         <div class="analog-clock" id="analogClock">
             <div id="clockMarkers"></div>
@@ -333,7 +335,6 @@
     </div>
 
     <script>
-        // --- Settings နှင့် အက်ပ်များ ---
         const container = document.getElementById('appContainer');
         const items = document.querySelectorAll('.app-item');
         const settingsPanel = document.getElementById('settingsPanel');
@@ -458,13 +459,12 @@
         const minuteHand = document.getElementById('minuteHand');
         const secondHand = document.getElementById('secondHand');
 
-        // နာရီပုံစံ ဆွဲခြင်း
         function drawClockFace(style) {
             clockMarkers.innerHTML = '';
             clockMarkers.className = style === 'numbers' ? 'clock-numbers' : 'clock-dots';
             
             for (let i = 1; i <= 12; i++) {
-                const angle = i * 30; // 360 / 12 = 30 degrees
+                const angle = i * 30; 
                 const el = document.createElement('div');
                 
                 if (style === 'numbers') {
@@ -472,11 +472,10 @@
                     el.innerText = i;
                 } else {
                     el.className = 'dot';
-                    // အဝိုင်းပုံစံမှာ 12, 3, 6, 9 ကို နည်းနည်းကြီးအောင် လုပ်မယ်
                     if (i % 3 === 0) {
                         el.style.width = '8px';
                         el.style.height = '8px';
-                        el.style.top = '2px';
+                        el.style.top = '6px';
                     }
                 }
                 el.style.transform = `rotate(${angle}deg)`;
@@ -484,13 +483,11 @@
             }
         }
 
-        // Settings ကနေ နာရီပုံစံ ပြောင်းခြင်း
         function changeClockStyle(style) {
             drawClockFace(style);
             localStorage.setItem('clockStyle', style);
         }
 
-        // နာရီလက်တံများ အလုပ်လုပ်ခြင်း
         function updateClock() {
             const now = new Date();
             const seconds = now.getSeconds();
@@ -506,13 +503,12 @@
             hourHand.style.transform = `translateX(-50%) rotate(${hourDeg}deg)`;
         }
 
-        // နာရီ ပုံစံကို သိမ်းထားတာရှိလား စစ်မယ်
-        const savedClockStyle = localStorage.getItem('clockStyle') || 'circle';
+        const savedClockStyle = localStorage.getItem('clockStyle') || 'numbers'; // မူလအတွက် နံပါတ်ပုံစံ သတ်မှတ်ထားတယ်
         document.getElementById('clockStyle').value = savedClockStyle;
         drawClockFace(savedClockStyle);
 
         setInterval(updateClock, 1000);
-        updateClock(); // စဖွင့်ချင်း အချိန်မှန်အောင်
+        updateClock(); 
     </script>
 </body>
 </html>
