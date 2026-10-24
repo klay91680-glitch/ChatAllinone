@@ -7,40 +7,42 @@
     <style>
         body {
             margin: 0;
-            padding: 40px 20px;
+            padding: 70px 20px 20px 20px; /* အပေါ်ကို နေရာချန်ထားတယ် */
             background: linear-gradient(to bottom, #2b2b52, #6a5acd, #b08d9e); 
             font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
             user-select: none; 
             -webkit-user-select: none;
             touch-action: none; 
             position: relative;
+            overflow: hidden;
         }
 
         /* Settings ခလုတ် */
         .settings-btn {
             position: fixed;
-            top: 20px;
+            top: 25px; 
             right: 20px;
             background: rgba(255, 255, 255, 0.2);
             border: none;
             color: white;
-            font-size: 24px;
-            padding: 10px;
+            font-size: 22px;
+            padding: 8px;
             border-radius: 50%;
             cursor: pointer;
-            z-index: 100;
+            z-index: 1000;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
-        /* Settings Panel (ပေါ်လာမယ့် ဘောင်) */
+        /* Settings Panel */
         .settings-panel {
             display: none;
             position: fixed;
-            top: 70px;
+            top: 75px;
             right: 20px;
             background: #2b2b52;
             border: 1px solid #6a5acd;
@@ -56,6 +58,8 @@
             margin: 0 0 15px 0;
             font-size: 16px;
             text-align: center;
+            border-bottom: 1px solid #6a5acd;
+            padding-bottom: 10px;
         }
 
         .control-group {
@@ -72,8 +76,16 @@
             width: 100%;
             cursor: pointer;
         }
+        
+        .control-group select {
+            width: 100%;
+            padding: 5px;
+            border-radius: 5px;
+            border: none;
+            background: #6a5acd;
+            color: white;
+        }
 
-        /* On/Off Switch ပုံစံ */
         .switch {
             display: flex;
             justify-content: space-between;
@@ -87,14 +99,17 @@
             cursor: pointer;
         }
 
+        /* Apps Grid အပိုင်း */
         .app-container {
             display: grid;
             grid-template-columns: repeat(3, 1fr); 
-            gap: 15px 10px; /* အကွာအဝေးကို နည်းနည်းချုံ့ထားတယ် */
+            gap: 15px 10px; 
             width: 100%;
             max-width: 350px;
             position: relative;
-            transition: all 0.3s ease;
+            margin-top: 15px; 
+            /* အောက်က အိုင်ကွန် ၃ ခုကို နည်းနည်းတင်ဖို့ အောက်ကို margin ချန်ထားတယ် */
+            margin-bottom: 130px; 
         }
 
         .app-item {
@@ -106,6 +121,7 @@
             cursor: grab; 
             position: relative;
             z-index: 1;
+            -webkit-tap-highlight-color: transparent; 
         }
 
         .app-item:active {
@@ -113,7 +129,7 @@
         }
 
         .app-item img {
-            width: 60px; /* မူလထက် နည်းနည်းချုံ့ထားတယ် */
+            width: 60px; 
             height: 60px;
             border-radius: 14px; 
             box-shadow: 0 4px 8px rgba(0,0,0,0.3); 
@@ -127,7 +143,7 @@
 
         .app-item span {
             color: white;
-            font-size: 11px; /* မူလထက် နည်းနည်းချုံ့ထားတယ် */
+            font-size: 11px; 
             text-align: center;
             font-weight: 500;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5); 
@@ -140,6 +156,103 @@
             transform: scale(1.1);
             box-shadow: 0 10px 20px rgba(0,0,0,0.5);
             z-index: 10;
+        }
+
+        /* နာရီ (Clock) ဒီဇိုင်း */
+        .clock-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+        }
+
+        .analog-clock {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        /* နာရီအမှတ်တံတွေ */
+        .clock-numbers {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        .number {
+            position: absolute;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            top: 5px; left: 50%;
+            transform-origin: 0 55px; /* နာရီဝိုင်းအလယ်ကို ချိန်ညှိရန် */
+        }
+
+        /* အပ်တွေ */
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            background: white;
+            border-radius: 4px;
+            transform: translateX(-50%);
+        }
+
+        .hour-hand {
+            width: 4px;
+            height: 30px;
+            background: #ff4d4d; /* နာရီအပ်နီ */
+            z-index: 3;
+        }
+
+        .minute-hand {
+            width: 3px;
+            height: 45px;
+            background: white;
+            z-index: 4;
+        }
+
+        .second-hand {
+            width: 1px;
+            height: 50px;
+            background: #ffcc00; /* စက္ကန့်အပ်ဝါ */
+            z-index: 5;
+        }
+
+        .center-dot {
+            width: 8px;
+            height: 8px;
+            background: #ff4d4d;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 6;
+        }
+        
+        /* နံပါတ်မပါတဲ့ ပုံစံအတွက် နာရီအမှတ်လေးတွေ */
+        .clock-dots {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+        }
+        .dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            top: 5px; left: 50%;
+            transform-origin: 0 55px;
         }
     </style>
 </head>
@@ -162,15 +275,21 @@
             <input type="range" id="textSize" min="8" max="20" value="11" oninput="changeTextSize(this.value)">
         </div>
 
+        <div class="control-group">
+            <label>နာရီ ပုံစံ</label>
+            <select id="clockStyle" onchange="changeClockStyle(this.value)">
+                <option value="circle">အဝိုင်းပုံစံ (အမှတ်လေးများ)</option>
+                <option value="numbers">နံပါတ်ဂဏန်းများဖြင့်</option>
+            </select>
+        </div>
+
         <div class="switch">
             <label>နေရာရွှေ့မှု မှတ်ထားရန်</label>
-            <!-- On/Off ခလုတ် -->
             <input type="checkbox" id="saveToggle" checked>
         </div>
     </div>
 
     <div class="app-container" id="appContainer">
-        
         <a href="https://www.facebook.com/" target="_blank" class="app-item">
             <img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/2023_Facebook_icon.svg" alt="Facebook">
             <span>Facebook</span>
@@ -200,24 +319,29 @@
             <img src="https://cdn-icons-png.flaticon.com/512/1041/1041916.png" alt="Beechat Social" style="background-color: #ffcc00;">
             <span>Beechat Social</span>
         </a>
+    </div>
 
+    <!-- နာရီ -->
+    <div class="clock-container">
+        <div class="analog-clock" id="analogClock">
+            <div id="clockMarkers"></div>
+            <div class="hand hour-hand" id="hourHand"></div>
+            <div class="hand minute-hand" id="minuteHand"></div>
+            <div class="hand second-hand" id="secondHand"></div>
+            <div class="center-dot"></div>
+        </div>
     </div>
 
     <script>
+        // --- Settings နှင့် အက်ပ်များ ---
         const container = document.getElementById('appContainer');
         const items = document.querySelectorAll('.app-item');
         const settingsPanel = document.getElementById('settingsPanel');
         
-        // Settings ဖွင့်/ပိတ်
         function toggleSettings() {
-            if (settingsPanel.style.display === 'none' || settingsPanel.style.display === '') {
-                settingsPanel.style.display = 'block';
-            } else {
-                settingsPanel.style.display = 'none';
-            }
+            settingsPanel.style.display = (settingsPanel.style.display === 'none' || settingsPanel.style.display === '') ? 'block' : 'none';
         }
 
-        // အိုင်ကွန် အရွယ်အစား ပြောင်းခြင်း
         function changeIconSize(val) {
             document.getElementById('iconSizeVal').innerText = val;
             items.forEach(item => {
@@ -228,7 +352,6 @@
             localStorage.setItem('iconSize', val);
         }
 
-        // စာသား အရွယ်အစား ပြောင်းခြင်း
         function changeTextSize(val) {
             document.getElementById('textSizeVal').innerText = val;
             items.forEach(item => {
@@ -238,11 +361,9 @@
             localStorage.setItem('textSize', val);
         }
 
-        // အက်ပ်စဖွင့်ချင်း သိမ်းထားတာတွေ ပြန်ယူခြင်း
         function loadSettings() {
             const savedIconSize = localStorage.getItem('iconSize');
             const savedTextSize = localStorage.getItem('textSize');
-            
             if (savedIconSize) {
                 document.getElementById('iconSize').value = savedIconSize;
                 changeIconSize(savedIconSize);
@@ -254,9 +375,7 @@
         }
 
         function saveOrder() {
-            const saveToggle = document.getElementById('saveToggle').checked;
-            if (!saveToggle) return; // Toggle ကို ပိတ်ထားရင် မသိမ်းဘူး
-
+            if (!document.getElementById('saveToggle').checked) return;
             const order = Array.from(container.children).map(item => item.getAttribute('href'));
             localStorage.setItem('appOrder', JSON.stringify(order));
         }
@@ -286,7 +405,6 @@
                 startX = touch.clientX;
                 startY = touch.clientY;
                 isDragging = false;
-                
                 touchTimer = setTimeout(() => {
                     if(!isDragging) draggedItem.classList.add('dragging');
                 }, 100); 
@@ -294,24 +412,19 @@
 
             item.addEventListener('touchmove', function(e) {
                 if (!draggedItem) return;
-                
                 const touch = e.touches[0];
-                const diffX = Math.abs(touch.clientX - startX);
-                const diffY = Math.abs(touch.clientY - startY);
-
-                if (diffX > 10 || diffY > 10) {
+                if (Math.abs(touch.clientX - startX) > 10 || Math.abs(touch.clientY - startY) > 10) {
                     isDragging = true;
                     clearTimeout(touchTimer); 
                     draggedItem.classList.add('dragging'); 
                     e.preventDefault(); 
-
-                    const elementUnderFinger = document.elementFromPoint(touch.clientX, touch.clientY);
-                    if (elementUnderFinger) {
-                        const targetItem = elementUnderFinger.closest('.app-item');
-                        if (targetItem && targetItem !== draggedItem) {
-                            const rect = targetItem.getBoundingClientRect();
+                    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+                    if (el) {
+                        const target = el.closest('.app-item');
+                        if (target && target !== draggedItem) {
+                            const rect = target.getBoundingClientRect();
                             const next = (touch.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
-                            container.insertBefore(draggedItem, next ? targetItem.nextSibling : targetItem);
+                            container.insertBefore(draggedItem, next ? target.nextSibling : target);
                         }
                     }
                 }
@@ -335,11 +448,71 @@
                     isDragging = false;
                 }
             });
-            
-            item.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-            });
+            item.addEventListener('contextmenu', (e) => e.preventDefault());
         });
+
+
+        // --- နာရီ လုပ်ဆောင်ချက်များ ---
+        const clockMarkers = document.getElementById('clockMarkers');
+        const hourHand = document.getElementById('hourHand');
+        const minuteHand = document.getElementById('minuteHand');
+        const secondHand = document.getElementById('secondHand');
+
+        // နာရီပုံစံ ဆွဲခြင်း
+        function drawClockFace(style) {
+            clockMarkers.innerHTML = '';
+            clockMarkers.className = style === 'numbers' ? 'clock-numbers' : 'clock-dots';
+            
+            for (let i = 1; i <= 12; i++) {
+                const angle = i * 30; // 360 / 12 = 30 degrees
+                const el = document.createElement('div');
+                
+                if (style === 'numbers') {
+                    el.className = 'number';
+                    el.innerText = i;
+                } else {
+                    el.className = 'dot';
+                    // အဝိုင်းပုံစံမှာ 12, 3, 6, 9 ကို နည်းနည်းကြီးအောင် လုပ်မယ်
+                    if (i % 3 === 0) {
+                        el.style.width = '8px';
+                        el.style.height = '8px';
+                        el.style.top = '2px';
+                    }
+                }
+                el.style.transform = `rotate(${angle}deg)`;
+                clockMarkers.appendChild(el);
+            }
+        }
+
+        // Settings ကနေ နာရီပုံစံ ပြောင်းခြင်း
+        function changeClockStyle(style) {
+            drawClockFace(style);
+            localStorage.setItem('clockStyle', style);
+        }
+
+        // နာရီလက်တံများ အလုပ်လုပ်ခြင်း
+        function updateClock() {
+            const now = new Date();
+            const seconds = now.getSeconds();
+            const minutes = now.getMinutes();
+            const hours = now.getHours();
+
+            const secDeg = seconds * 6;
+            const minDeg = minutes * 6 + seconds * 0.1;
+            const hourDeg = (hours % 12) * 30 + minutes * 0.5;
+
+            secondHand.style.transform = `translateX(-50%) rotate(${secDeg}deg)`;
+            minuteHand.style.transform = `translateX(-50%) rotate(${minDeg}deg)`;
+            hourHand.style.transform = `translateX(-50%) rotate(${hourDeg}deg)`;
+        }
+
+        // နာရီ ပုံစံကို သိမ်းထားတာရှိလား စစ်မယ်
+        const savedClockStyle = localStorage.getItem('clockStyle') || 'circle';
+        document.getElementById('clockStyle').value = savedClockStyle;
+        drawClockFace(savedClockStyle);
+
+        setInterval(updateClock, 1000);
+        updateClock(); // စဖွင့်ချင်း အချိန်မှန်အောင်
     </script>
 </body>
-    </html>
+</html>
