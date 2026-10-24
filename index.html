@@ -14,9 +14,10 @@
             justify-content: center;
             min-height: 100vh;
             box-sizing: border-box;
+            /* မျက်နှာပြင်မှာ စာသားတွေ ရွေးမိတာမျိုး ကာကွယ်ရန် */
             user-select: none; 
             -webkit-user-select: none;
-            /* စာမျက်နှာတစ်ခုလုံးမှာ ဖိထားရင် စာသားတွေ ရွေးမိတာမျိုး ကာကွယ်ရန် */
+            touch-action: none; /* ဖုန်းမျက်နှာပြင် အပေါ်အောက် ဆွဲဆင်းတာကို ပိတ်ရန် */
         }
 
         .app-container {
@@ -38,7 +39,6 @@
 
         .app-item:active {
             cursor: grabbing;
-            transform: scale(1.1); 
         }
 
         .app-item img {
@@ -49,9 +49,9 @@
             margin-bottom: 8px;
             background-color: white; 
             object-fit: cover; 
-            /* ဒီအချက်က အရေးကြီးဆုံးပါ။ ပုံကို ဖိရင် Menu မတက်အောင် ပိတ်ထားတာပါ */
+            /* ပုံကို ဖိရင် ဖုန်းက Menu မတက်အောင် ပိတ်ထားတာပါ */
             pointer-events: none; 
-            -webkit-touch-callout: none; /* iPhone တွေမှာ ပုံဖိရင် Menu မတက်အောင် */
+            -webkit-touch-callout: none; 
         }
 
         .app-item span {
@@ -60,13 +60,14 @@
             text-align: center;
             font-weight: 500;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5); 
-            /* စာသားကို ဖိရင်လည်း Menu မတက်အောင် ပိတ်ထားတယ် */
             pointer-events: none; 
         }
 
+        /* ဆွဲနေတဲ့အခါ ပေါ်လာမယ့် ဒီဇိုင်း */
         .dragging {
             opacity: 0.5;
             transform: scale(1.1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
     </style>
 </head>
@@ -74,32 +75,38 @@
 
     <div class="app-container" id="appContainer">
         
-        <a href="https://www.facebook.com/" target="_blank" class="app-item" draggable="true">
+        <!-- ၁။ Facebook -->
+        <a href="https://www.facebook.com/" target="_blank" class="app-item">
             <img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/2023_Facebook_icon.svg" alt="Facebook">
             <span>Facebook</span>
         </a>
 
-        <a href="https://www.facebook.com/messages" target="_blank" class="app-item" draggable="true">
+        <!-- ၂။ Messenger -->
+        <a href="https://www.facebook.com/messages" target="_blank" class="app-item">
             <img src="https://upload.wikimedia.org/wikipedia/commons/b/be/Facebook_Messenger_logo_2020.svg" alt="Messenger">
             <span>Messenger</span>
         </a>
 
-        <a href="https://www.google.com/" target="_blank" class="app-item" draggable="true">
+        <!-- ၃။ Chrome -->
+        <a href="https://www.google.com/" target="_blank" class="app-item">
             <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/Google_Chrome_icon_%28February_2022%29.svg" alt="Chrome">
             <span>Chrome</span>
         </a>
 
-        <a href="https://m.tiktok.com/" target="_blank" class="app-item" draggable="true">
+        <!-- ၄။ TikTok -->
+        <a href="https://m.tiktok.com/" target="_blank" class="app-item">
             <img src="https://cdn-icons-png.flaticon.com/512/3046/3046125.png" alt="TikTok" style="background-color: black;">
             <span>TikTok</span>
         </a>
 
-        <a href="https://mastergyi11.github.io/beeai/" target="_blank" class="app-item" draggable="true">
+        <!-- ၅။ BeeChat AI -->
+        <a href="https://mastergyi11.github.io/beeai/" target="_blank" class="app-item">
             <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" alt="BeeChat AI" style="background-color: black;">
             <span>BeeChat AI</span>
         </a>
 
-        <a href="https://mastergyi11.github.io/chat/" target="_blank" class="app-item" draggable="true">
+        <!-- ၆။ Beechat Social -->
+        <a href="https://mastergyi11.github.io/chat/" target="_blank" class="app-item">
             <img src="https://cdn-icons-png.flaticon.com/512/1041/1041916.png" alt="Beechat Social" style="background-color: #ffcc00;">
             <span>Beechat Social</span>
         </a>
@@ -110,11 +117,13 @@
         const container = document.getElementById('appContainer');
         const items = document.querySelectorAll('.app-item');
 
+        // နေရာရွှေ့ထားတာကို ဖုန်း Memory ထဲ သိမ်းဆည်းခြင်း
         function saveOrder() {
             const order = Array.from(container.children).map(item => item.getAttribute('href'));
             localStorage.setItem('appOrder', JSON.stringify(order));
         }
 
+        // အက်ပ်ပြန်ဖွင့်ရင် သိမ်းထားတဲ့အတိုင်း ပြန်စီခြင်း
         function loadOrder() {
             const savedOrder = JSON.parse(localStorage.getItem('appOrder'));
             if (savedOrder) {
@@ -124,42 +133,79 @@
                 });
             }
         }
-
         loadOrder();
 
         let draggedItem = null;
+        let startX, startY;
+        let isDragging = false;
+        let touchTimer = null;
 
         items.forEach(item => {
-            item.addEventListener('dragstart', function(e) {
+            // ၁။ လက်နဲ့ စထိလိုက်ချိန်
+            item.addEventListener('touchstart', function(e) {
                 draggedItem = this;
-                setTimeout(() => this.classList.add('dragging'), 0);
-            });
+                const touch = e.touches[0];
+                startX = touch.clientX;
+                startY = touch.clientY;
+                isDragging = false;
+                
+                // ခဏလောက် ဖိထားမှ ဆွဲလို့ရအောင် စောင့်မယ် (မလိုချင်ရင် ဒီ timer ကို ဖျက်နိုင်တယ်)
+                touchTimer = setTimeout(() => {
+                    if(!isDragging) draggedItem.classList.add('dragging');
+                }, 100); 
+            }, { passive: true });
 
-            item.addEventListener('dragend', function() {
-                setTimeout(() => {
-                    this.classList.remove('dragging');
+            // ၂။ လက်နဲ့ ဆွဲရွှေ့နေချိန်
+            item.addEventListener('touchmove', function(e) {
+                if (!draggedItem) return;
+                
+                const touch = e.touches[0];
+                const diffX = Math.abs(touch.clientX - startX);
+                const diffY = Math.abs(touch.clientY - startY);
+
+                // နည်းနည်းလေး ရွှေ့ပြီဆိုရင် Drag စတယ်လို့ သတ်မှတ်မယ်
+                if (diffX > 10 || diffY > 10) {
+                    isDragging = true;
+                    clearTimeout(touchTimer); // timer ကို ရပ်မယ်
+                    draggedItem.classList.add('dragging'); // ဆွဲနေတဲ့ ပုံစံပြောင်းမယ်
+                    e.preventDefault(); // စာမျက်နှာ ဆွဲဆင်းတာကို ကာကွယ်မယ်
+
+                    // လက်နဲ့ ထိနေတဲ့ နေရာက အိုင်ကွန်ကို ရှာမယ်
+                    const elementUnderFinger = document.elementFromPoint(touch.clientX, touch.clientY);
+                    if (elementUnderFinger) {
+                        const targetItem = elementUnderFinger.closest('.app-item');
+                        if (targetItem && targetItem !== draggedItem) {
+                            const rect = targetItem.getBoundingClientRect();
+                            const next = (touch.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
+                            container.insertBefore(draggedItem, next ? targetItem.nextSibling : targetItem);
+                        }
+                    }
+                }
+            }, { passive: false });
+
+            // ၃။ လက်ကို လွှတ်လိုက်ချိန်
+            item.addEventListener('touchend', function(e) {
+                clearTimeout(touchTimer);
+                if (draggedItem) {
+                    draggedItem.classList.remove('dragging');
+                    if (isDragging) {
+                        saveOrder(); // နေရာအသစ်ကို သိမ်းမယ်
+                        // ဆွဲရွှေ့ပြီးတာနဲ့ App ထဲ မဝင်သွားအောင် ကာကွယ်မယ်
+                        e.preventDefault(); 
+                    }
                     draggedItem = null;
-                    saveOrder(); 
-                }, 0);
-            });
-
-            item.addEventListener('dragover', function(e) {
-                e.preventDefault(); 
-                if (this !== draggedItem) {
-                    const rect = this.getBoundingClientRect();
-                    const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
-                    container.insertBefore(draggedItem, next ? this.nextSibling : this);
                 }
             });
 
-            // ဖိဆွဲနေတုန်း လင့်ခ်ထဲ မဝင်သွားအောင် ကာကွယ်ခြင်း
+            // နှိပ်လိုက်ရင် App ထဲ ဝင်သွားတာ ကာကွယ်ခြင်း
             item.addEventListener('click', function(e) {
-                if (this.classList.contains('dragging')) {
+                if (isDragging) {
                     e.preventDefault();
+                    isDragging = false;
                 }
             });
             
-            // ဖုန်းတွေမှာ ဖိထားရင် ပေါ်တတ်တဲ့ Menu ကို ပိတ်ခြင်း
+            // ဖုန်းရဲ့ Menu မတက်အောင် ပိတ်ခြင်း
             item.addEventListener('contextmenu', function(e) {
                 e.preventDefault();
             });
