@@ -99,8 +99,6 @@
             max-width: 350px;
             position: relative;
             margin-top: 15px; 
-            /* အောက်က နာရီအတွက် နေရာချန်ထားတယ် */
-            margin-bottom: 200px; 
         }
 
         .app-item {
@@ -149,21 +147,47 @@
             z-index: 10;
         }
 
-        /* နာရီအသစ် (Iframe ဖြင့် ထည့်သွင်းခြင်း) */
-        .clock-container {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
+        /* Widgets အပိုင်း (နာရီနှင့် ရက်စွဲ) */
+        .widgets-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-top: 30px; /* အိုင်ကွန်တွေနဲ့ ခွာထားတယ် */
+            gap: 20px; /* နာရီနဲ့ ရက်စွဲကြား အကွာအဝေး */
+            z-index: 5;
+        }
+
+        /* ရက်စွဲ (Date) ပုံစံ */
+        .date-container {
             width: 90%;
             max-width: 320px;
-            height: 280px; /* နာရီအသစ်ရဲ့ အမြင့်ကို ချိန်ညှိထားတယ် */
+            height: 180px; /* အမြင့်ကို ချိန်ညှိထားတယ် */
             border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            border: 2px solid rgba(255, 215, 0, 0.3); /* ရွှေရောင်ဘောင် ခပ်ပါးပါး */
-            z-index: 5;
-            background: #1a1a2e; /* အောက်ခံအရောင် အနက်ရောင် */
+            border: 2px solid rgba(255, 215, 0, 0.3); 
+            background: #1a1a2e; 
+        }
+
+        .date-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* နာရီ (Clock) ပုံစံ */
+        .clock-container {
+            width: 90%;
+            max-width: 320px;
+            height: 280px; 
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            border: 2px solid rgba(255, 215, 0, 0.3); 
+            background: #1a1a2e; 
         }
 
         .clock-container iframe {
@@ -229,9 +253,17 @@
         </a>
     </div>
 
-    <!-- နာရီအသစ် (Iframe) -->
-    <div class="clock-container">
-        <iframe src="https://klay91680-glitch.github.io/dateclock/" scrolling="no"></iframe>
+    <!-- Widgets အပိုင်း -->
+    <div class="widgets-container">
+        <!-- ရက်စွဲ အသစ် -->
+        <div class="date-container">
+            <iframe src="https://klay91680-glitch.github.io/dataday/" scrolling="no"></iframe>
+        </div>
+
+        <!-- နာရီ -->
+        <div class="clock-container">
+            <iframe src="https://klay91680-glitch.github.io/dateclock/" scrolling="no"></iframe>
+        </div>
     </div>
 
     <script>
