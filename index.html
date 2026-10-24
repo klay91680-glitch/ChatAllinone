@@ -14,10 +14,9 @@
             justify-content: center;
             min-height: 100vh;
             box-sizing: border-box;
-            /* မျက်နှာပြင်မှာ စာသားတွေ ရွေးမိတာမျိုး ကာကွယ်ရန် */
             user-select: none; 
             -webkit-user-select: none;
-            touch-action: none; /* ဖုန်းမျက်နှာပြင် အပေါ်အောက် ဆွဲဆင်းတာကို ပိတ်ရန် */
+            touch-action: none; 
         }
 
         .app-container {
@@ -26,6 +25,8 @@
             gap: 25px 15px; 
             width: 100%;
             max-width: 350px;
+            /* အိုင်ကွန်တွေ နေရာရွှေ့တဲ့အခါ သူတို့ရဲ့ နေရာလွတ်တွေကို မှတ်ထားဖို့ */
+            position: relative;
         }
 
         .app-item {
@@ -35,6 +36,8 @@
             text-decoration: none; 
             transition: transform 0.2s;
             cursor: grab; 
+            position: relative;
+            z-index: 1;
         }
 
         .app-item:active {
@@ -49,7 +52,6 @@
             margin-bottom: 8px;
             background-color: white; 
             object-fit: cover; 
-            /* ပုံကို ဖိရင် ဖုန်းက Menu မတက်အောင် ပိတ်ထားတာပါ */
             pointer-events: none; 
             -webkit-touch-callout: none; 
         }
@@ -63,11 +65,20 @@
             pointer-events: none; 
         }
 
-        /* ဆွဲနေတဲ့အခါ ပေါ်လာမယ့် ဒီဇိုင်း */
         .dragging {
             opacity: 0.5;
             transform: scale(1.1);
             box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+        
+        /* ကွက်လပ်နေရာတွေအတွက် (Empty Space) */
+        .empty-space {
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            border: 2px dashed rgba(255, 255, 255, 0.2); /* ကွက်လပ်ဆိုတာ သိအောင် မျဉ်းပြတ်လေးနဲ့ ပြထားတယ် */
+            margin-bottom: 8px;
         }
     </style>
 </head>
@@ -111,25 +122,40 @@
             <span>Beechat Social</span>
         </a>
 
+        <!-- ကွက်လပ်တွေ ထားချင်ရင် ဒီအောက်မှာ ထည့်နိုင်ပါတယ် -->
+        <!-- <div class="empty-space"></div> -->
+        <!-- <div class="empty-space"></div> -->
+
     </div>
 
     <script>
         const container = document.getElementById('appContainer');
         const items = document.querySelectorAll('.app-item');
 
-        // နေရာရွှေ့ထားတာကို ဖုန်း Memory ထဲ သိမ်းဆည်းခြင်း
         function saveOrder() {
-            const order = Array.from(container.children).map(item => item.getAttribute('href'));
+            const order = Array.from(container.children).map(item => {
+                if(item.classList.contains('app-item')) {
+                    return item.getAttribute('href');
+                } else {
+                    return 'EMPTY'; // ကွက်လပ်ဖြစ်နေရင် EMPTY လို့ သိမ်းမယ်
+                }
+            });
             localStorage.setItem('appOrder', JSON.stringify(order));
         }
 
-        // အက်ပ်ပြန်ဖွင့်ရင် သိမ်းထားတဲ့အတိုင်း ပြန်စီခြင်း
         function loadOrder() {
             const savedOrder = JSON.parse(localStorage.getItem('appOrder'));
             if (savedOrder) {
                 savedOrder.forEach(href => {
-                    const item = container.querySelector(`[href="${href}"]`);
-                    if (item) container.appendChild(item);
+                    if (href !== 'EMPTY') {
+                        const item = container.querySelector(`[href="${href}"]`);
+                        if (item) container.appendChild(item);
+                    } else {
+                        // ကွက်လပ်ဖြစ်နေရင် ကွက်လပ်အကွက်လေး ပြန်ထည့်မယ်
+                        const emptyDiv = document.createElement('div');
+                        emptyDiv.className = 'empty-space';
+                        container.appendChild(emptyDiv);
+                    }
                 });
             }
         }
@@ -141,7 +167,6 @@
         let touchTimer = null;
 
         items.forEach(item => {
-            // ၁။ လက်နဲ့ စထိလိုက်ချိန်
             item.addEventListener('touchstart', function(e) {
                 draggedItem = this;
                 const touch = e.touches[0];
@@ -149,13 +174,11 @@
                 startY = touch.clientY;
                 isDragging = false;
                 
-                // ခဏလောက် ဖိထားမှ ဆွဲလို့ရအောင် စောင့်မယ် (မလိုချင်ရင် ဒီ timer ကို ဖျက်နိုင်တယ်)
                 touchTimer = setTimeout(() => {
                     if(!isDragging) draggedItem.classList.add('dragging');
                 }, 100); 
             }, { passive: true });
 
-            // ၂။ လက်နဲ့ ဆွဲရွှေ့နေချိန်
             item.addEventListener('touchmove', function(e) {
                 if (!draggedItem) return;
                 
@@ -163,18 +186,17 @@
                 const diffX = Math.abs(touch.clientX - startX);
                 const diffY = Math.abs(touch.clientY - startY);
 
-                // နည်းနည်းလေး ရွှေ့ပြီဆိုရင် Drag စတယ်လို့ သတ်မှတ်မယ်
                 if (diffX > 10 || diffY > 10) {
                     isDragging = true;
-                    clearTimeout(touchTimer); // timer ကို ရပ်မယ်
-                    draggedItem.classList.add('dragging'); // ဆွဲနေတဲ့ ပုံစံပြောင်းမယ်
-                    e.preventDefault(); // စာမျက်နှာ ဆွဲဆင်းတာကို ကာကွယ်မယ်
+                    clearTimeout(touchTimer); 
+                    draggedItem.classList.add('dragging'); 
+                    e.preventDefault(); 
 
-                    // လက်နဲ့ ထိနေတဲ့ နေရာက အိုင်ကွန်ကို ရှာမယ်
                     const elementUnderFinger = document.elementFromPoint(touch.clientX, touch.clientY);
                     if (elementUnderFinger) {
-                        const targetItem = elementUnderFinger.closest('.app-item');
+                        const targetItem = elementUnderFinger.closest('.app-item, .empty-space');
                         if (targetItem && targetItem !== draggedItem) {
+                            // ကွက်လပ်နေရာကို ဆွဲချရင် အဲဒီနေရာမှာ ထားမယ်
                             const rect = targetItem.getBoundingClientRect();
                             const next = (touch.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
                             container.insertBefore(draggedItem, next ? targetItem.nextSibling : targetItem);
@@ -183,21 +205,18 @@
                 }
             }, { passive: false });
 
-            // ၃။ လက်ကို လွှတ်လိုက်ချိန်
             item.addEventListener('touchend', function(e) {
                 clearTimeout(touchTimer);
                 if (draggedItem) {
                     draggedItem.classList.remove('dragging');
                     if (isDragging) {
-                        saveOrder(); // နေရာအသစ်ကို သိမ်းမယ်
-                        // ဆွဲရွှေ့ပြီးတာနဲ့ App ထဲ မဝင်သွားအောင် ကာကွယ်မယ်
+                        saveOrder(); 
                         e.preventDefault(); 
                     }
                     draggedItem = null;
                 }
             });
 
-            // နှိပ်လိုက်ရင် App ထဲ ဝင်သွားတာ ကာကွယ်ခြင်း
             item.addEventListener('click', function(e) {
                 if (isDragging) {
                     e.preventDefault();
@@ -205,11 +224,10 @@
                 }
             });
             
-            // ဖုန်းရဲ့ Menu မတက်အောင် ပိတ်ခြင်း
             item.addEventListener('contextmenu', function(e) {
                 e.preventDefault();
             });
         });
     </script>
 </body>
-                </html>
+    </html>
