@@ -14,9 +14,9 @@
             justify-content: center;
             min-height: 100vh;
             box-sizing: border-box;
-            /* အိုင်ကွန်တွေ ဆွဲတဲ့အခါ စာသားတွေ ရွေးမိတာမျိုး မဖြစ်အောင် ပိတ်ထားတယ် */
             user-select: none; 
             -webkit-user-select: none;
+            /* စာမျက်နှာတစ်ခုလုံးမှာ ဖိထားရင် စာသားတွေ ရွေးမိတာမျိုး ကာကွယ်ရန် */
         }
 
         .app-container {
@@ -33,12 +33,12 @@
             align-items: center;
             text-decoration: none; 
             transition: transform 0.2s;
-            cursor: grab; /* ဖိဆွဲလို့ရမယ်ဆိုတာ ပြဖို့ */
+            cursor: grab; 
         }
 
         .app-item:active {
             cursor: grabbing;
-            transform: scale(1.1); /* ဖိထားရင် နည်းနည်းကြီးလာစေရန် */
+            transform: scale(1.1); 
         }
 
         .app-item img {
@@ -49,8 +49,9 @@
             margin-bottom: 8px;
             background-color: white; 
             object-fit: cover; 
-            /* ပုံကို ဖိဆွဲရင် ပုံအရိပ်ပုံစံ မထွက်အောင် ပိတ်ထားတယ် */
+            /* ဒီအချက်က အရေးကြီးဆုံးပါ။ ပုံကို ဖိရင် Menu မတက်အောင် ပိတ်ထားတာပါ */
             pointer-events: none; 
+            -webkit-touch-callout: none; /* iPhone တွေမှာ ပုံဖိရင် Menu မတက်အောင် */
         }
 
         .app-item span {
@@ -59,10 +60,10 @@
             text-align: center;
             font-weight: 500;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5); 
+            /* စာသားကို ဖိရင်လည်း Menu မတက်အောင် ပိတ်ထားတယ် */
             pointer-events: none; 
         }
 
-        /* ဖိဆွဲနေတဲ့ အိုင်ကွန်ရဲ့ ဒီဇိုင်း */
         .dragging {
             opacity: 0.5;
             transform: scale(1.1);
@@ -73,37 +74,31 @@
 
     <div class="app-container" id="appContainer">
         
-        <!-- ၁။ Facebook -->
         <a href="https://www.facebook.com/" target="_blank" class="app-item" draggable="true">
             <img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/2023_Facebook_icon.svg" alt="Facebook">
             <span>Facebook</span>
         </a>
 
-        <!-- ၂။ Messenger -->
         <a href="https://www.facebook.com/messages" target="_blank" class="app-item" draggable="true">
             <img src="https://upload.wikimedia.org/wikipedia/commons/b/be/Facebook_Messenger_logo_2020.svg" alt="Messenger">
             <span>Messenger</span>
         </a>
 
-        <!-- ၃။ Chrome -->
         <a href="https://www.google.com/" target="_blank" class="app-item" draggable="true">
             <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/Google_Chrome_icon_%28February_2022%29.svg" alt="Chrome">
             <span>Chrome</span>
         </a>
 
-        <!-- ၄။ TikTok -->
         <a href="https://m.tiktok.com/" target="_blank" class="app-item" draggable="true">
             <img src="https://cdn-icons-png.flaticon.com/512/3046/3046125.png" alt="TikTok" style="background-color: black;">
             <span>TikTok</span>
         </a>
 
-        <!-- ၅။ BeeChat AI -->
         <a href="https://mastergyi11.github.io/beeai/" target="_blank" class="app-item" draggable="true">
             <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" alt="BeeChat AI" style="background-color: black;">
             <span>BeeChat AI</span>
         </a>
 
-        <!-- ၆။ Beechat Social -->
         <a href="https://mastergyi11.github.io/chat/" target="_blank" class="app-item" draggable="true">
             <img src="https://cdn-icons-png.flaticon.com/512/1041/1041916.png" alt="Beechat Social" style="background-color: #ffcc00;">
             <span>Beechat Social</span>
@@ -115,13 +110,11 @@
         const container = document.getElementById('appContainer');
         const items = document.querySelectorAll('.app-item');
 
-        // ဖုန်းထဲမှာ နေရာအသစ်ကို သိမ်းထားဖို့ (Local Storage)
         function saveOrder() {
             const order = Array.from(container.children).map(item => item.getAttribute('href'));
             localStorage.setItem('appOrder', JSON.stringify(order));
         }
 
-        // အက်ပ်ဖွင့်တာနဲ့ နောက်ဆုံးသိမ်းထားတဲ့ နေရာအတိုင်း ပြန်စီဖို့
         function loadOrder() {
             const savedOrder = JSON.parse(localStorage.getItem('appOrder'));
             if (savedOrder) {
@@ -132,30 +125,26 @@
             }
         }
 
-        // စာမျက်နှာစဖွင့်ချင်း နေရာချထားမှုကို ပြန်ယူမယ်
         loadOrder();
 
         let draggedItem = null;
 
         items.forEach(item => {
-            // ဖိဆွဲစပြီဆိုရင်
             item.addEventListener('dragstart', function(e) {
                 draggedItem = this;
                 setTimeout(() => this.classList.add('dragging'), 0);
             });
 
-            // ဖိဆွဲပြီး လွှတ်ချလိုက်ရင်
             item.addEventListener('dragend', function() {
                 setTimeout(() => {
                     this.classList.remove('dragging');
                     draggedItem = null;
-                    saveOrder(); // နေရာအသစ်ကို သိမ်းလိုက်မယ်
+                    saveOrder(); 
                 }, 0);
             });
 
-            // တခြားအိုင်ကွန်တွေရဲ့ အပေါ်ကို ရောက်သွားရင်
             item.addEventListener('dragover', function(e) {
-                e.preventDefault(); // ဒါမပါရင် ဆွဲလို့ရမှာ မဟုတ်ဘူး
+                e.preventDefault(); 
                 if (this !== draggedItem) {
                     const rect = this.getBoundingClientRect();
                     const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
@@ -163,13 +152,18 @@
                 }
             });
 
-            // နှိပ်လိုက်တဲ့အခါ လင့်ခ်ထဲ မဝင်သွားအောင် ကာကွယ်ခြင်း (ဆွဲနေတုန်းပဲ ကာကွယ်မယ်)
+            // ဖိဆွဲနေတုန်း လင့်ခ်ထဲ မဝင်သွားအောင် ကာကွယ်ခြင်း
             item.addEventListener('click', function(e) {
                 if (this.classList.contains('dragging')) {
                     e.preventDefault();
                 }
             });
+            
+            // ဖုန်းတွေမှာ ဖိထားရင် ပေါ်တတ်တဲ့ Menu ကို ပိတ်ခြင်း
+            item.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
         });
     </script>
 </body>
-    </html>
+                </html>
