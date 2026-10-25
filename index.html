@@ -383,19 +383,6 @@
             });
             item.addEventListener('contextmenu', (e) => e.preventDefault());
         });
-
-        // TikTok Pop-up ဖျောက်ရန် ကုဒ်
-        setInterval(function() {
-            const elements = document.querySelectorAll('*');
-            elements.forEach(el => {
-                if (el.innerText && el.innerText.includes('Get the full app experience')) {
-                    const popup = el.closest('div[role="dialog"]') || el.closest('div[style*="position: fixed"]') || el.parentElement.parentElement;
-                    if (popup) {
-                        popup.style.display = 'none';
-                    }
-                }
-            });
-        }, 1000);
     </script>
 </body>
-    </html>
+</html>
