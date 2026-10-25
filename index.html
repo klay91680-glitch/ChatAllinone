@@ -247,7 +247,6 @@
             <span>BeeChat AI</span>
         </a>
 
-        <!-- Beechat Social အတွက် လင့်ခ်အသစ် ထည့်ထားပါတယ် -->
         <a href="https://mastergyi11.github.io/chat/" target="_blank" class="app-item">
             <img src="https://klay91680-glitch.github.io/beechatsocial-png/ic_launcher.png" alt="Beechat Social" style="background-color: #ffcc00;">
             <span>Beechat Social</span>
@@ -384,6 +383,19 @@
             });
             item.addEventListener('contextmenu', (e) => e.preventDefault());
         });
+
+        // TikTok Pop-up ဖျောက်ရန် ကုဒ်
+        setInterval(function() {
+            const elements = document.querySelectorAll('*');
+            elements.forEach(el => {
+                if (el.innerText && el.innerText.includes('Get the full app experience')) {
+                    const popup = el.closest('div[role="dialog"]') || el.closest('div[style*="position: fixed"]') || el.parentElement.parentElement;
+                    if (popup) {
+                        popup.style.display = 'none';
+                    }
+                }
+            });
+        }, 1000);
     </script>
 </body>
     </html>
